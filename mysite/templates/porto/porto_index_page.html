@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-portopage{% endblock %}
+
+{% block content %}
+
+<h1>MYLOGO.COM</h1>
+<hr>
+
+<h2>PORTFOLIO</h2>
+<p>Resize the browser window to see the responsive effect.</p>
+
+<!-- Portfolio Gallery Grid -->
+<div class="row">
+    {% for post in postpages %}
+    {% with post=post.specific %}
+    <div class="column">
+        <div class="content">
+            {% image post.header_image original as header_image %}
+            <img src="{{header_image.url}}" alt="{{header_image.title}}" style="width:100%">
+            <h3><a href="{% pageurl post %}">{{ post.title }}</a></h3>
+            <p>{{ post.overview }}</p>           
+            
+        </div>
+    </div>
+    {% endwith %}
+    {% endfor %}
+    <!-- END GRID -->
+</div>
+
+<!-- END MAIN -->
+{% endblock %}

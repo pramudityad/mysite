@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-postpage{% endblock %}
+
+{% block content %}
+<div class="content">
+    <h1>{{ page.title }}</h1>
+
+    {% with categories=page.categories.all %}
+    {% if categories %}
+    <h3>Categories</h3>
+    <ul>
+        {% for category in categories %}
+        <i class="fa fa-tag" aria-hidden="true">{{ category.name }}</i>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <div class="intro">Overview : {{ page.overview }}</div>
+
+    {{ page.body|richtext }}
+
+    {% if page.tags.all.count %}
+    <div class="tags">
+        <p><b>Stack : </b>
+        </p>
+        {% for tag in page.tags.all %}
+        <i class="fa fa-tags" aria-hidden="true">{{ tag }}</i>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+    <div class="row">
+        {% image page.header_image original %}
+        <img src="{{header_image.url}}" alt="{{header_image.title}}" style="width:100%">
+    </div>
+
+    <p class="meta" style="color: grey;">Posted on {{ page.date }}</p>
+</div>
+
+<p><a href="{{ page.get_parent.url }}"><i class="fa fa-arrow-left" aria-hidden="true"></i></a></p>
+
+{% endblock %}
