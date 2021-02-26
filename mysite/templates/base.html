@@ -9,18 +9,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
 
     {# Global stylesheets #}
-    <link rel="stylesheet" type="text/css" href="{% static 'css/mysite.css' %}">
-    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
-
+    <link rel="icon" href="{% static 'img/keyboard_key_d.png' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'css/mysite2.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
 </head>
+{% block header %}
+{% include "includes/header.html" %}
+{% endblock header %}
 
 <body>
     <!-- MAIN (Center website) -->
-    <div class="main">
+    <div class="container">
         {% block content %}
         {% endblock content %}
     </div>
 
+    <!-- Footer -->
+    <footer>
+        {% include "includes/footer.html" %}
+    </footer>
 
 </body>
+
 </html>

@@ -1,7 +1,9 @@
 from django.db import models
+from wagtail.search import index
 from django import forms
 from wagtail.core.models import Page
 from wagtail.snippets.models import register_snippet
+from wagtail.contrib.routable_page.models import RoutablePageMixin, route
 
 from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.admin.edit_handlers import FieldPanel, MultiFieldPanel, InlinePanel
@@ -15,7 +17,7 @@ from taggit.models import TaggedItemBase, Tag as TaggitTag
 # Create your models here.
 
 
-class PortoIndexPage(Page):
+class PortoIndexPage(RoutablePageMixin, Page):
     description = models.CharField(max_length=255, blank=True,)
 
     content_panels = Page.content_panels + [
@@ -26,10 +28,31 @@ class PortoIndexPage(Page):
         context = super(PortoIndexPage, self).get_context(
             request, *args, **kwargs)
         postpages = self.get_children().live().order_by('-first_published_at')
-        context['postpages'] = postpages
-        context['menuitems'] = self.get_children().filter(
-            live=True, show_in_menus=True)
+        context['posts'] = self.posts
+        context['blog_page'] = self
         return context
+    
+    def get_posts(self):
+        return PostPage.objects.descendant_of(self).live()
+
+    @route(r'^tag/(?P<tag>[-\w]+)/$')
+    def post_by_tag(self, request, tag, *args, **kwargs):
+        self.search_type = 'tag'
+        self.search_term = tag
+        self.posts = self.get_posts().filter(tags__slug=tag)
+        return Page.serve(self, request, *args, **kwargs)
+
+    @route(r'^category/(?P<category>[-\w]+)/$')
+    def post_by_category(self, request, category, *args, **kwargs):
+        self.search_type = 'category'
+        self.search_term = category
+        self.posts = self.get_posts().filter(categories__slug=category)
+        return Page.serve(self, request, *args, **kwargs)
+
+    @route(r'^$')
+    def post_list(self, request, *args, **kwargs):
+        self.posts = self.get_posts()
+        return Page.serve(self, request, *args, **kwargs)
 
 
 class PostPage(Page):
@@ -68,6 +91,21 @@ class PostPage(Page):
         #     heading="Carousel Images",
         # ),
     ]
+
+    search_fields = Page.search_fields + [
+        index.SearchField('title'),
+        index.SearchField('body'),
+    ]
+
+    @property
+    def blog_page(self):
+        return self.get_parent().specific
+
+    def get_context(self, request, *args, **kwargs):
+        context = super(PostPage, self).get_context(request, *args, **kwargs)
+        context['blog_page'] = self.blog_page
+        context['post'] = self
+        return context
 
 
 @register_snippet

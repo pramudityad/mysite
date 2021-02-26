@@ -1,46 +1,74 @@
 {% extends "base.html" %}
 
-{% load wagtailcore_tags wagtailimages_tags %}
+{% load wagtailcore_tags wagtailimages_tags wagtailroutablepage_tags %}
 
 {% block body_class %}template-postpage{% endblock %}
 
 {% block content %}
-<div class="content">
+<div class="content is-normal">
     <h1>{{ page.title }}</h1>
-
     {% with categories=page.categories.all %}
     {% if categories %}
     <h3>Categories</h3>
     <ul>
-        {% for category in categories %}
-        <i class="fa fa-tag" aria-hidden="true">{{ category.name }}</i>
-        {% endfor %}
+        <div class="field is-grouped is-grouped-multiline">
+            {% for category in categories %}
+            <div class="control">
+                <div class="tags has-addons">
+                    <a class="tag is-link" href={% routablepageurl blog_page "post_by_category" category.slug %}>{{ category.name }}</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
     </ul>
     {% endif %}
     {% endwith %}
 
-    <div class="intro">Overview : {{ page.overview }}</div>
-
+    <p class="subtitle is-5">Overview : {{ page.overview }}</p>
+    <hr>
     {{ page.body|richtext }}
 
+
+    <h4 class="subtitle is-4">Stack</h4>
     {% if page.tags.all.count %}
     <div class="tags">
-        <p><b>Stack : </b>
-        </p>
-        {% for tag in page.tags.all %}
-        <i class="fa fa-tags" aria-hidden="true">{{ tag }}</i>
-        {% endfor %}
+        <div class="tags">
+            {% for tag in page.tags.all %}
+            <a href={% routablepageurl blog_page "post_by_tag" tag.slug %}><span class="tag"> {{ tag }} </span></a>
+            {% endfor %}
+        </div>
     </div>
     {% endif %}
 
-    <div class="row">
+    {% if page.link_url|length > 0 %}
+    <a href={{ page.link_url }} target="_blank" title="link_url"><button class="button">
+            <span class="icon">
+                <i class="fab fa-github"></i>
+            </span>
+            <span>GitHub</span>
+        </button>
+    </a>
+    {% else %}
+    {% endif %}
+    <figure>
         {% image page.header_image original %}
         <img src="{{header_image.url}}" alt="{{header_image.title}}" style="width:100%">
-    </div>
+    </figure>
 
-    <p class="meta" style="color: grey;">Posted on {{ page.date }}</p>
+    <div class="columns is-vcentered">
+        <div class="column is-half">
+            <p class="bd-notification is-primary">
+                <time>Posted on {{ page.date }}</time>
+            </p>
+        </div>
+    </div>
+    <div class="buttons">
+        <a class="button" href="{{ page.get_parent.url }}"><span class="icon"><i class="fa fa-arrow-left"
+            aria-hidden="true"></i></span><span>Back</span></a>
+    </div>
 </div>
 
-<p><a href="{{ page.get_parent.url }}"><i class="fa fa-arrow-left" aria-hidden="true"></i></a></p>
+
 
 {% endblock %}

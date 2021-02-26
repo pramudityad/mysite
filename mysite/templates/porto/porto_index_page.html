@@ -6,28 +6,43 @@
 
 {% block content %}
 
-<h1>MYLOGO.COM</h1>
-<hr>
-
-<h2>PORTFOLIO</h2>
-<p>Resize the browser window to see the responsive effect.</p>
 
 <!-- Portfolio Gallery Grid -->
+
+{% if page.search_term %}
+  <div class="notification is-primary is-light">
+    Search Results for <strong>{{ page.search_type }}: {{ page.search_term }}</strong>
+  </div>
+{% endif %}
+
 <div class="row">
-    {% for post in postpages %}
+    {% for post in posts %}
     {% with post=post.specific %}
     <div class="column">
-        <div class="content">
-            {% image post.header_image original as header_image %}
-            <img src="{{header_image.url}}" alt="{{header_image.title}}" style="width:100%">
-            <h3><a href="{% pageurl post %}">{{ post.title }}</a></h3>
-            <p>{{ post.overview }}</p>           
-            
-        </div>
+        <div class="card">
+            <div class="card-image">
+              <figure class="image is-4by3">
+                {% image post.header_image original as header_image %}
+                <img src="{{header_image.url}}" alt="{{header_image.title}}" style="width:100%">
+              </figure>
+            </div>
+            <div class="card-content">
+              <div class="media">
+                <div class="media-content">
+                  <p class="title is-4"><a href="{% pageurl post %}">{{ post.title }}</a></p>
+                </div>
+              </div>
+          
+              <div class="content">
+                {{ post.overview }}               
+              </div>
+            </div>
+          </div>
+
+
     </div>
     {% endwith %}
     {% endfor %}
-    <!-- END GRID -->
 </div>
 
 <!-- END MAIN -->
